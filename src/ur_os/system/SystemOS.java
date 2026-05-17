@@ -19,6 +19,9 @@ import ur_os.process.EndInstruction;
 import ur_os.process.IOInstruction;
 import ur_os.process.Instruction;
 import ur_os.virtualmemory.SwapMemory;
+import ur_os.process.CPUInstruction;
+import ur_os.process.CPUInstructionType;
+
 
 /**
  *
@@ -63,6 +66,7 @@ public class SystemOS implements Runnable{
         //initSimulationQueue();
         //initSimulationQueueSimple();
         initSimulationQueueSimpler();
+        testCPUInstruction();
         
 
         showProcesses();
@@ -276,6 +280,80 @@ public class SystemOS implements Runnable{
         
         clock = 0;
     }
+    
+    public void testCPUInstruction() {
+        System.out.println("=== TEST CPU INSTRUCTION ===");
+
+        System.out.println("-- Prueba 1: ADD R0, R1 --");
+        CPUInstruction add = new CPUInstruction(CPUInstructionType.ADD, 0, 1);
+        System.out.println(add);
+        System.out.println("OpType: " + add.getOpType());     
+        System.out.println("R1: " + add.getR1());              
+        System.out.println("R2: " + add.getR2());            
+        System.out.println("Ciclos: " + add.getCycleNumber()); 
+
+        
+        System.out.println("-- Prueba 2: MUL R2, R3 --");
+        CPUInstruction mul = new CPUInstruction(CPUInstructionType.MUL, 2, 3);
+        System.out.println(mul);
+        System.out.println("OpType: " + mul.getOpType());     
+        System.out.println("Ciclos: " + mul.getCycleNumber()); 
+        boolean mulCiclo1 = mul.advanceInstruction();
+        System.out.println("Termino en ciclo 1: " + mulCiclo1); 
+        boolean mulCiclo2 = mul.advanceInstruction();
+        System.out.println("Termino en ciclo 2: " + mulCiclo2); 
+        boolean mulCiclo3 = mul.advanceInstruction();
+        System.out.println("Termino en ciclo 3: " + mulCiclo3); 
+        System.out.println("-- Prueba 3: DIV R0, R1 --");
+        CPUInstruction div = new CPUInstruction(CPUInstructionType.DIV, 0, 1);
+        System.out.println(div);
+        System.out.println("Ciclos: " + div.getCycleNumber());
+        int ciclosDiv = 0;
+        while (!div.advanceInstruction()) {
+            ciclosDiv++;
+        }
+        ciclosDiv++;
+        System.out.println("Ciclos ejecutados: " + ciclosDiv); 
+
+        System.out.println("-- Prueba 4: MOV R0, 42 --");
+        CPUInstruction mov = new CPUInstruction(CPUInstructionType.MOV, 0, (byte) 42);
+        System.out.println(mov);
+        System.out.println("OpType: " + mov.getOpType());      
+        System.out.println("R1: " + mov.getR1());               
+        System.out.println("R2: " + mov.getR2());               
+        System.out.println("Constante: " + mov.getConstant());  
+
+        System.out.println("-- Prueba 5: NOT R1 --");
+        CPUInstruction not = new CPUInstruction(CPUInstructionType.NOT, 1, -1);
+        System.out.println(not);
+        System.out.println("OpType: " + not.getOpType()); 
+        System.out.println("R1: " + not.getR1());          
+        System.out.println("R2: " + not.getR2());         
+
+        System.out.println("-- Prueba 6: AND R0, R1 --");
+        CPUInstruction and = new CPUInstruction(CPUInstructionType.AND, 0, 1);
+        System.out.println(and);
+        System.out.println("OpType: " + and.getOpType()); 
+        System.out.println("Ciclos: " + and.getCycleNumber()); 
+
+        System.out.println("-- Prueba 7: Copia de MUL R2, R3 --");
+        CPUInstruction mulCopia = new CPUInstruction(mul);
+        System.out.println(mulCopia);
+        System.out.println("OpType copia: " + mulCopia.getOpType());      
+        System.out.println("R1 copia: " + mulCopia.getR1());              
+        System.out.println("R2 copia: " + mulCopia.getR2());               
+        System.out.println("Ciclos copia: " + mulCopia.getCycleNumber()); 
+
+        System.out.println("-- Prueba 8: Constructor por defecto --");
+        CPUInstruction def = new CPUInstruction();
+        System.out.println(def);
+        System.out.println("OpType: " + def.getOpType());
+        System.out.println("R1: " + def.getR1());         
+        System.out.println("R2: " + def.getR2());         
+        System.out.println("Ciclos: " + def.getCycleNumber()); 
+
+        System.out.println("=== FIN TEST ===");
+    } 
     
     
     
