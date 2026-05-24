@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+// [REEMPLAZAR TODO] Reemplazar el contenido completo de este archivo
 package ur_os.memory;
 
 import java.util.LinkedList;
 import java.util.Random;
 
-/**
- *
- * @author super
- */
 public class MemoryOperationList {
     LinkedList<MemoryInstruction> mol;
     Random r;
@@ -20,48 +13,51 @@ public class MemoryOperationList {
         mol = new LinkedList();
         r = new Random();
     }
+
     
-    public void generateSimpleMemoryOperations(int processSize){
+    public void generateSimpleMemoryOperations(int processSize) {
         MemoryOperationType mtype;
+        MemoryLoadType loadType;  
         byte b;
-        
+        int ri;                   
+
         for (int i = 0; i < MAX_SIZE_SIMPLE_LIST; i++) {
-            mtype = r.nextInt() % 2 == 0 ? MemoryOperationType.LOAD :MemoryOperationType.STORE;
-            if(mtype == MemoryOperationType.STORE){
-                b = (byte)(r.nextInt()%128);
-            }else{
-                b=0;
+            int pick = Math.abs(r.nextInt() % 3);
+            if (pick == 0) {
+                mtype = MemoryOperationType.LOAD;
+                loadType = MemoryLoadType.CONST;
+                b = (byte)(r.nextInt() % 128);  
+            } else if (pick == 1) {
+                mtype = MemoryOperationType.LOAD;
+                loadType = MemoryLoadType.MEM;
+                b = 0;
+            } else {
+                mtype = MemoryOperationType.STORE;
+                loadType = MemoryLoadType.MEM;  
+                b = 0;
             }
-            
-            mol.add(new MemoryInstruction(mtype, r.nextInt(processSize),b));
+            ri = Math.abs(r.nextInt() % 8);  
+            mol.add(new MemoryInstruction(mtype, loadType, r.nextInt(processSize), b, ri));
         }
     }
+
     
-    public void add(MemoryInstruction m){
-        mol.add(m);
+    public void add(MemoryInstruction m) { mol.add(m); }
+
+    public MemoryInstruction getNext() {
+        if (mol.size() > 0) return mol.remove();
+        else return null;
     }
-    
-    public MemoryInstruction getNext(){
-        if(mol.size() > 0)
-            return mol.remove();
-        else
-            return null;
-    }
-    
-    public int getSize(){
-        return mol.size();
-    }
-    
+
+    public int getSize() { return mol.size(); }
+
     @Override
-    public String toString(){
-       StringBuilder sb = new StringBuilder();
-       
-        for (MemoryInstruction memoryOperation : mol) {
-            sb.append(memoryOperation.toString());
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (MemoryInstruction mi : mol) {
+            sb.append(mi.toString());
             sb.append("\n");
         }
-       
-       return sb.toString();
+        return sb.toString();
     }
-    
 }

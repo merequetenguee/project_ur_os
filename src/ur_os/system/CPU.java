@@ -5,17 +5,14 @@
  */
 package ur_os.system;
 
+import java.util.ArrayList;
 import ur_os.memory.Memory;
-import ur_os.memory.MemoryInstruction;
 import ur_os.memory.freememorymagament.MemorySlot;
 import ur_os.process.CPUInstruction;
 import ur_os.process.Instruction;
 import ur_os.process.Process;
-import ur_os.process.ProcessInstructionType;
 import ur_os.process.ProcessState;
 import ur_os.virtualmemory.SwapMemory;
-
-import java.util.ArrayList;
 
 
 /**
@@ -121,7 +118,27 @@ public class CPU {
     }
     
     public void executeCPUOperation(CPUInstruction i){
-        System.out.println("Executing CPU instruction");
+        Register reg1 = mu.getGPRegister(i.getR1());
+        if (reg1 == null) return;
+
+        byte val1 = reg1.getData();
+        byte val2 = (i.getR2() == -1)
+                ? i.getConstant()
+                : (mu.getGPRegister(i.getR2()) != null ? mu.getGPRegister(i.getR2()).getData() : 0);
+
+        byte result;
+        switch (i.getOpType()) {
+            case ADD: reg1.setData((byte)(val1 + val2)); break;
+            case SUB: reg1.setData((byte)(val1 - val2)); break;
+            case MUL: reg1.setData((byte)(val1 * val2)); break;
+            case DIV: reg1.setData(val2 != 0 ? (byte)(val1 / val2) : (byte)0); break;
+            case MOV: reg1.setData(val2); break;
+            case AND: reg1.setData((byte)(val1 & val2)); break;
+            case OR:  reg1.setData((byte)(val1 | val2)); break;
+            case XOR: reg1.setData((byte)(val1 ^ val2)); break;
+            case NOT: reg1.setData((byte)(~val1)); break;
+        }
+        System.out.println("Ejecutando CPU: " + i + " | R" + i.getR1() + " = " + reg1.getData());
     }
     
     public Process removeProcess(){

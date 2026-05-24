@@ -5,23 +5,21 @@
  */
 package ur_os.system;
 
-import ur_os.process.ProcessInstructionType;
-import ur_os.memory.contiguous.SMM_Contiguous;
-import ur_os.memory.Memory;
-import ur_os.memory.MemoryManagerType;
-import ur_os.process.Process;
 import java.util.ArrayList;
 import java.util.Random;
+import ur_os.memory.Memory;
 import ur_os.memory.MemoryInstruction;
+import ur_os.memory.MemoryLoadType;
+import ur_os.memory.MemoryManagerType;
 import ur_os.memory.MemoryOperationType;
 import ur_os.memory.freememorymagament.FreeMemorySlotManager;
+import ur_os.process.CPUInstruction;
+import ur_os.process.CPUInstructionType;
 import ur_os.process.EndInstruction;
 import ur_os.process.IOInstruction;
 import ur_os.process.Instruction;
+import ur_os.process.Process;
 import ur_os.virtualmemory.SwapMemory;
-import ur_os.process.CPUInstruction;
-import ur_os.process.CPUInstructionType;
-
 
 /**
  *
@@ -66,8 +64,8 @@ public class SystemOS implements Runnable{
         //initSimulationQueue();
         //initSimulationQueueSimple();
         initSimulationQueueSimpler();
-        testCPUInstruction();
-        
+       
+         testMemoryInstruction();
 
         showProcesses();
         this.simType = simType;
@@ -126,7 +124,7 @@ public class SystemOS implements Runnable{
         p.setSize(tempSize);
         Instruction temp;  
         p.addCPUInstructions(3);
-        temp = new MemoryInstruction(MemoryOperationType.LOAD, r.nextInt(tempSize), (byte)-1, 4); //Load from logical address 5, 4 clock cycles    
+        temp = new MemoryInstruction(MemoryOperationType.LOAD, MemoryLoadType.CONST, 0, (byte)42, 0, 4);
         p.addInstruction(temp);
         p.addCPUInstructions(3);
         temp = new EndInstruction();
@@ -140,7 +138,7 @@ public class SystemOS implements Runnable{
         p.setSize(tempSize);
         p.addCPUInstructions(3);
         //temp = new IOInstruction(5); 
-        temp = new MemoryInstruction(MemoryOperationType.STORE, r.nextInt(tempSize), (byte)38, 3); //Store in logical address 10, valir 38, 3 clock cycles
+        temp = new MemoryInstruction(MemoryOperationType.STORE, MemoryLoadType.MEM, r.nextInt(tempSize), (byte)0, 0, 3);
         p.addInstruction(temp);
         p.addCPUInstructions(3);
         temp = new EndInstruction();
@@ -154,7 +152,7 @@ public class SystemOS implements Runnable{
         p.setSize(tempSize);
         p.addCPUInstructions(7);
         //temp = new IOInstruction(3);    
-        temp = new MemoryInstruction(MemoryOperationType.LOAD, r.nextInt(tempSize), (byte)-1, 4); //Load from logical address 62, 4 clock cycles    
+        temp = new MemoryInstruction(MemoryOperationType.LOAD, MemoryLoadType.MEM, r.nextInt(tempSize), (byte)0, 1, 4);
         p.addInstruction(temp);
         p.addCPUInstructions(5);
         temp = new EndInstruction();
@@ -167,8 +165,7 @@ public class SystemOS implements Runnable{
         p.setSize(tempSize);
         p.addCPUInstructions(4);
         //temp = new IOInstruction(3);    
-        temp = new MemoryInstruction(MemoryOperationType.STORE, r.nextInt(tempSize), (byte)42, 4); //Store in logical address 10, valir 38, 3 clock cycles
-        p.addInstruction(temp);
+        temp = new MemoryInstruction(MemoryOperationType.STORE, MemoryLoadType.MEM, r.nextInt(tempSize), (byte)0, 1, 4);
         p.addCPUInstructions(7);
         temp = new EndInstruction();
         p.addInstruction(temp);
@@ -355,7 +352,40 @@ public class SystemOS implements Runnable{
         System.out.println("=== FIN TEST ===");
     } 
     
-    
+    public void testMemoryInstruction() {
+    System.out.println("=== TEST MEMORY INSTRUCTION ===");
+
+    System.out.println("-- Test 1: LOAD CONST 42 -> R0 --");
+    MemoryInstruction lc = new MemoryInstruction(MemoryOperationType.LOAD, MemoryLoadType.CONST, 0, (byte)42, 0, 3);
+    System.out.println(lc);
+    System.out.println("MType: " + lc.getMType() + " | LoadType: " + lc.getLoadType());
+    System.out.println("Constante: " + lc.getContent() + " | Ri: R" + lc.getRi() + " | Ciclos: " + lc.getCycleNumber());
+
+    System.out.println("-- Test 2: LOAD Mem[100] -> R1 --");
+    MemoryInstruction lm = new MemoryInstruction(MemoryOperationType.LOAD, MemoryLoadType.MEM, 100, (byte)0, 1, 4);
+    System.out.println(lm);
+    System.out.println("MType: " + lm.getMType() + " | LoadType: " + lm.getLoadType());
+    System.out.println("Direccion: " + lm.getLogicalAddress() + " | Ri: R" + lm.getRi() + " | Ciclos: " + lm.getCycleNumber());
+
+    System.out.println("-- Test 3: STORE R2 -> Mem[200] --");
+    MemoryInstruction st = new MemoryInstruction(MemoryOperationType.STORE, MemoryLoadType.MEM, 200, (byte)0, 2, 3);
+    System.out.println(st);
+    System.out.println("MType: " + st.getMType() + " | Ri: R" + st.getRi() + " | Direccion: " + st.getLogicalAddress());
+
+    System.out.println("-- Test 4: Avanzar ciclos LOAD CONST --");
+    MemoryInstruction mi = new MemoryInstruction(MemoryOperationType.LOAD, MemoryLoadType.CONST, 0, (byte)7, 0, 3);
+    int ciclos = 0;
+    while (!mi.advanceInstruction()) { ciclos++; }
+    ciclos++;
+    System.out.println("Ciclos ejecutados: " + ciclos); 
+
+    System.out.println("-- Test 5: Copia de LOAD MEM --");
+    MemoryInstruction copia = new MemoryInstruction(lm);
+    System.out.println(copia);
+    System.out.println("MType copia: " + copia.getMType() + " | LoadType copia: " + copia.getLoadType());
+
+    System.out.println("=== FIN TEST MEMORY INSTRUCTION ===");
+}
     
     public boolean isSimulationFinished(){
         

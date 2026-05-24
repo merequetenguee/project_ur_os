@@ -12,5 +12,13 @@ public  class Register {
         return data;
     }
     public RegisterType getType() {return type;}
+    public void setData(byte data){
+        this.data = data;
 
+
+}
+ @Override
+    public String toString() {
+        return type + "[" + data + "]";
+    }
 }
