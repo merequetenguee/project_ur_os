@@ -1,4 +1,4 @@
-// [REEMPLAZAR TODO] Reemplazar el contenido completo de este archivo
+
 package ur_os.memory;
 
 import java.util.Random;
